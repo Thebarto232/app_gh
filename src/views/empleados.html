@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Empleados</title>
+</head>
+<body>
+
+  <h2>Empleados</h2>
+  <button id="logout">Salir</button>
+
+  <ul id="lista"></ul>
+
+  <script type="module">
+    import { requireAuth } from "../auth/guard.js";
+    import { getEmpleados } from "../empleados/empleados.js";
+
+    requireAuth();
+
+    const lista = document.getElementById("lista");
+    const empleados = await getEmpleados();
+
+    empleados.forEach(e => {
+      const li = document.createElement("li");
+      li.textContent = `${e.nombre} - ${e.cargo}`;
+      lista.appendChild(li);
+    });
+
+    document.getElementById("logout").addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "./login.html";
+    });
+  </script>
+
+</body>
+</html>
