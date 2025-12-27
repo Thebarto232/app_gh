@@ -1,26 +1,31 @@
-import './style.css'
-import { login } from "./auth/login";
-import { getEmpleados, createEmpleado } from "./empleados/empleados";
+import './style.css';
+import { initRouter } from './router/router.js';
 
-// LOGIN automático (prueba)
-const init = async () => {
-  try {
-    const user = await login("admin", "admin123");
-    console.log("Logueado como:", user);
+document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('user'));
 
-    const empleados = await getEmpleados();
-    console.log("Empleados:", empleados);
+    // Si hay usuario, llenamos los componentes del Layout que ya están en index.html
+    if (user) {
+        const elements = {
+            name: document.getElementById('display-user-name'),
+            role: document.getElementById('user-role-badge'),
+            avatar: document.getElementById('user-avatar-head'),
+            greeting: document.getElementById('dynamic-greeting')
+        };
 
-    const nuevo = await createEmpleado({
-      documento: "555",
-      nombres: "Pedro",
-      apellidos: "Ramirez"
-    });
+        if (elements.name) elements.name.innerText = user.nombre || user.username;
+        if (elements.role) elements.role.innerText = user.rol;
+        if (elements.avatar) {
+            elements.avatar.innerText = (user.nombre || user.username || 'U').charAt(0).toUpperCase();
+        }
 
-    console.log("Empleado creado:", nuevo);
-  } catch (error) {
-    console.error(error.message);
-  }
-};
+        if (elements.greeting) {
+            const hr = new Date().getHours();
+            const msg = hr < 12 ? 'Buen día' : hr < 18 ? 'Buenas tardes' : 'Buenas noches';
+            elements.greeting.innerText = `${msg}, ${user.nombre?.split(' ')[0] || 'Usuario'}`;
+        }
+    }
 
-init();
+    // Arrancamos el router
+    initRouter();
+});

@@ -1,0 +1,41 @@
+<div class="view-container content-animate">
+    <header class="view-header">
+        <div>
+            <h1>Agenda de Citas</h1>
+            <p>Gestiona las entrevistas y reuniones del equipo</p>
+        </div>
+    </header>
+
+    <div class="calendar-card">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<div id="modalCita" class="modal-overlay hidden">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Nueva Cita</h3>
+            <button type="button" id="btnCerrarX" class="close-btn">&times;</button>
+        </div>
+        
+        <form id="formNuevaCita" class="modal-body">
+            <input type="hidden" id="fechaInicio">
+            <input type="hidden" id="fechaFin">
+
+            <div class="form-group">
+                <label>Asunto / Título</label>
+                <input type="text" id="inputTitulo" placeholder="Ej: Entrevista de Trabajo" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="inputDesc" rows="4" placeholder="Detalles de la cita..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" id="btnCerrarModal">Cancelar</button>
+                <button type="submit" class="btn-save">Guardar Cita</button>
+            </div>
+        </form>
+    </div>
+</div>

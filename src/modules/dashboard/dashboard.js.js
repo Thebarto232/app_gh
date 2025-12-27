@@ -1,39 +1,59 @@
-import { getDashboardData } from "./dashboard.service.js";
+import { Calendar } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import esLocale from '@fullcalendar/core/locales/es';
 
-const initDashboard = async () => {
-  try {
-    const data = await getDashboardData();
+export const initCalendar = async () => {
+    const calendarEl = document.getElementById('calendar');
+    const modal = document.getElementById('modalCita');
+    const form = document.getElementById('formNuevaCita');
 
-    document.getElementById("totalEmpleados").textContent =
-      data?.totalEmpleados ?? 0;
+    const calendar = new Calendar(calendarEl, {
+        plugins: [dayGridPlugin, interactionPlugin],
+        initialView: 'dayGridMonth',
+        locale: esLocale,
+        selectable: true,
+        events: 'http://localhost:3000/api/dashboard/citas', // Tu ruta de backend
 
-    document.getElementById("totalUsuarios").textContent =
-      data?.totalUsuarios ?? 0;
+        select: function(info) {
+            // Cuando el usuario selecciona una fecha, abrimos el diseño del modal
+            document.getElementById('fechaInicio').value = info.startStr;
+            document.getElementById('fechaFin').value = info.endStr;
+            modal.style.display = 'block';
+        }
+    });
 
-    document.getElementById("empleadosActivos").textContent =
-      data?.empleadosActivos ?? 0;
+    calendar.render();
 
-  } catch (error) {
-    console.error("Error cargando dashboard", error);
-    document.querySelector(".dashboard").innerHTML =
-      "<p>Error al cargar información del dashboard</p>";
-  }
+    // Cerrar modal
+    document.getElementById('btnCerrarModal').onclick = () => modal.style.display = 'none';
+
+    // Enviar información al backend
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const nuevaCita = {
+            titulo: document.getElementById('inputTitulo').value,
+            descripcion: document.getElementById('inputDesc').value,
+            fecha_inicio: document.getElementById('fechaInicio').value,
+            fecha_fin: document.getElementById('fechaFin').value,
+            fk_id_usuario: localStorage.getItem('id_usuario') // El ID que viene del login
+        };
+
+        const response = await fetch('http://localhost:3000/api/citas', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(nuevaCita)
+        });
+
+        if (response.ok) {
+            modal.style.display = 'none';
+            form.reset();
+            calendar.refetchEvents(); // Recarga las citas sin refrescar la página
+            alert("Cita agendada correctamente");
+        }
+    };
 };
-
-// Acciones rápidas (mejor práctica)
-const goToModule = (label) => {
-  const items = [...document.querySelectorAll(".sidebar li")];
-  const target = items.find(li => li.textContent === label);
-  target?.click();
-};
-
-document.getElementById("btnEmpleados")?.addEventListener("click", () => {
-  goToModule("Empleados");
-});
-
-document.getElementById("btnUsuarios")?.addEventListener("click", () => {
-  goToModule("Usuarios");
-});
-
-// Esperar DOM
-document.addEventListener("DOMContentLoaded", initDashboard);

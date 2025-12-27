@@ -1,13 +1,80 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>app_oriona</title>
-  </head>
-  <body>
-    <div id="app"></div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectPro | Talent OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+</head>
+<body data-theme="auth">
+    <div id="app"></div> 
+
+    <div id="dashboard-wrapper" class="dashboard-container hidden">
+        <aside class="side-navigation">
+            <div class="sidebar-brand">
+                <div class="brand-orb">RH</div>
+                <span class="brand-name">ConnectPro</span>
+            </div>
+            
+            <nav class="module-menu">
+                <a href="/dashboard" class="module-link active">
+                    <div class="link-icon">📅</div>
+                    <span>Agenda</span>
+                </a>
+                <a href="/empleados" id="nav-admin" class="module-link">
+                    <div class="link-icon">👥</div>
+                    <span>Talento</span>
+                </a>
+                <a href="/ajustes" class="module-link">
+                    <div class="link-icon">⚙️</div>
+                    <span>Ajustes</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout-alt" onclick="logout()">
+                    <span>Cerrar Sesión</span>
+                    <i>🚪</i>
+                </button>
+            </div>
+        </aside>
+
+        <div class="main-viewport">
+            <header class="top-nav">
+                <div class="page-context">
+                    <h2 id="page-title">Panel de Gestión</h2>
+                    <span id="dynamic-greeting" class="greeting-text">Hola, cargando...</span>
+                </div>
+
+                <div class="user-control-center">
+                    <div class="profile-card">
+                        <div class="avatar-container">
+                            <div class="avatar-sm" id="user-avatar-head">U</div>
+                            <span class="status-indicator"></span>
+                        </div>
+                        <div class="user-meta-head">
+                            <strong id="display-user-name">Usuario</strong>
+                            <span id="user-role-badge">Administrator</span>
+                        </div>
+                        <div class="dropdown-trigger">▼</div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="workspace">
+                <div id="dashboard-content" class="content-animate"></div> 
+            </main>
+        </div>
+    </div>
+
     <script type="module" src="/src/main.js"></script>
-  </body>
+    <script>
+        function logout(){ 
+            localStorage.clear(); 
+            window.location.href='/'; 
+        }
+    </script>
+</body>
 </html>

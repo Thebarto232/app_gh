@@ -1,0 +1,29 @@
+<div class="login-container">
+    <h2>Registro de Personal RRHH</h2>
+    <form id="registerForm" class="login-form">
+        <div class="field">
+            <label for="reg-username">Usuario</label>
+            <input type="text" id="reg-username" placeholder="Nombre de usuario" required />
+        </div>
+
+        <div class="field">
+            <label for="reg-password">Contraseña</label>
+            <input type="password" id="reg-password" placeholder="Cree una contraseña" required />
+        </div>
+
+        <div class="field">
+            <label for="reg-rol">Rol Asignado</label>
+            <select id="reg-rol" required>
+                <option value="">Seleccione un rol...</option>
+                <option value="1">Admin</option>
+                <option value="2">Gestion Humana</option>
+                <option value="3">Visitante</option>
+            </select>
+        </div>
+
+        <button type="submit" id="btnRegister">Registrar Usuario</button>
+    </form>
+
+    <p id="reg-error" class="error"></p>
+    <p id="reg-success" style="color: green; display: none;">¡Usuario creado con éxito! Redirigiendo...</p>
+</div>

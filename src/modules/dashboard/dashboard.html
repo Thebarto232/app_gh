@@ -1,29 +1,54 @@
-<section class="dashboard">
+<div class="dashboard-view animate-fade">
+    <header class="view-header">
+        <div>
+            <h1>Gestión de Talento</h1>
+            <p>Organiza las entrevistas y reuniones del equipo</p>
+        </div>
+        <div class="view-actions">
+            <span class="badge-info">Citas hoy: <strong id="count-citas">0</strong></span>
+        </div>
+    </header>
 
-  <h2>Dashboard Administrador</h2>
-
-  <div class="cards">
-    <div class="card">
-      <h3 id="totalEmpleados">0</h3>
-      <p>Empleados</p>
+    <div class="calendar-card">
+        <div id="calendar"></div>
     </div>
+</div>
 
-    <div class="card">
-      <h3 id="totalUsuarios">0</h3>
-      <p>Usuarios</p>
+<div id="modalCita" class="modal-overlay hidden">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Nueva Cita</h3>
+            <button class="close-icon" id="btnCerrarX">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="formNuevaCita">
+                <div class="form-group">
+                    <label>Asunto o Título</label>
+                    <input type="text" id="inputTitulo" placeholder="Ej: Entrevista técnica - Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción / Observaciones</label>
+                    <textarea id="inputDesc" rows="3" placeholder="Detalles importantes de la reunión..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Inicio</label>
+                        <input type="text" id="displayFechaInicio" readonly disabled>
+                        <input type="hidden" id="fechaInicio">
+                    </div>
+                    <div class="form-group">
+                        <label>Fin</label>
+                        <input type="text" id="displayFechaFin" readonly disabled>
+                        <input type="hidden" id="fechaFin">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="btnCerrarModal">Cancelar</button>
+                    <button type="submit" class="btn-save">Agendar Cita</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="card">
-      <h3 id="empleadosActivos">0</h3>
-      <p>Activos</p>
-    </div>
-  </div>
-
-  <div class="actions">
-    <button id="btnEmpleados">Gestionar Empleados</button>
-    <button id="btnUsuarios">Gestionar Usuarios</button>
-  </div>
-
-</section>
-
-<script type="module" src="./dashboard.js"></script>
+</div>
