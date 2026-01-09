@@ -1,39 +1,59 @@
-// src/modules/dashboard/dashboard.service.js
+const API_URL = 'http://localhost:3000/api/dashboard';
+
+// Función para obtener headers actualizados con el token más reciente
+const getHeaders = () => ({
+    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    'Content-Type': 'application/json'
+});
+
 export const getCitas = async () => {
     try {
-        const token = localStorage.getItem('token');
-        
-        // CORRECCIÓN: La ruta debe ser /api/dashboard/citas según tu app.js
-        const response = await fetch('http://localhost:3000/api/dashboard/citas', {
-            method: 'GET',
-            headers: { 
-                'Authorization': `Bearer ${token}`, // Verifica que el token no sea null
-                'Content-Type': 'application/json'
-            }
+        const response = await fetch(`${API_URL}/citas`, { 
+            method: 'GET', 
+            headers: getHeaders() 
         });
-        
-        if (response.status === 401) {
-            console.error("Sesión expirada o token inválido");
-            // Opcional: window.location.href = '/login';
-            return [];
-        }
-
-        if (!response.ok) throw new Error('Error al obtener citas');
-        
+        if (!response.ok) throw new Error('Error al obtener eventos');
         const data = await response.json();
         
-        return data.map(cita => ({
-            id: cita.id_cita,
-            title: cita.titulo,
-            start: cita.fecha_inicio, // FullCalendar necesita formato ISO: YYYY-MM-DD
-            end: cita.fecha_fin,
-            description: cita.descripcion,
+        return data.map(evento => ({
+            id: evento.id,
+            title: evento.title,
+            start: evento.start,
+            end: evento.end || evento.start,
             extendedProps: {
-                id_usuario: cita.fk_id_usuario
+                tipo: evento.tipo, // 'CITA', 'CUMPLE', 'ANIVERSARIO'
+                descripcion: evento.descripcion || ''
             }
         }));
     } catch (error) {
-        console.error("Error en servicio de citas:", error);
+        console.error("Error en getCitas:", error);
+        return [];
+    }
+};
+
+// Obtener catálogos para los selects del formulario (EPS, Pensiones, Deptos)
+export const getCatalogosAdmin = async (tipo) => {
+    try {
+        const res = await fetch(`${API_URL}/catalogos/${tipo}`, { 
+            method: 'GET', 
+            headers: getHeaders() 
+        });
+        return await res.json();
+    } catch (error) {
+        console.error(`Error al obtener catálogo ${tipo}:`, error);
+        return [];
+    }
+};
+
+// Obtener empleados para la tabla de gestión
+export const getTodosLosEmpleados = async () => {
+    try {
+        const res = await fetch('http://localhost:3000/api/empleados', { 
+            headers: getHeaders() 
+        });
+        return await res.json();
+    } catch (error) {
+        console.error("Error al obtener empleados:", error);
         return [];
     }
 };

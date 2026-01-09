@@ -5,76 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ConnectPro | Talent OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <link rel="stylesheet" href="/src/style.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 </head>
-<body data-theme="auth">
+<body data-theme="auth" class="bg-gray-50 overflow-hidden">
     <div id="app"></div> 
 
-    <div id="dashboard-wrapper" class="dashboard-container hidden">
-        <aside class="side-navigation">
-            <div class="sidebar-brand">
-                <div class="brand-orb">RH</div>
-                <span class="brand-name">ConnectPro</span>
+    <div id="dashboard-wrapper" class="dashboard-container flex h-screen w-full hidden">
+        
+        <aside class="side-navigation w-64 flex-shrink-0 bg-gray-900 h-full overflow-y-auto flex flex-col">
+            <div class="sidebar-brand-custom p-6 border-b border-gray-800">
+                <span class="brand-icon-main material-symbols-outlined text-blue-500">sync_alt</span>
+                <div class="brand-box">
+                    <span class="brand-name-text text-white font-bold text-lg">APP ORIONA</span>
+                </div>
             </div>
             
-            <nav class="module-menu">
-                <a href="/dashboard" class="module-link active">
-                    <div class="link-icon">📅</div>
-                    <span>Agenda</span>
+            <nav class="module-menu flex-1 p-4 space-y-1">
+                <div class="px-3 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Análisis</div>
+                <a href="/dashboard" class="module-link flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span>Dashboard General</span>
                 </a>
-                <a href="/empleados" id="nav-admin" class="module-link">
-                    <div class="link-icon">👥</div>
-                    <span>Talento</span>
+
+                <div class="px-3 py-2 mt-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Gestión</div>
+                <a href="/area" class="module-link flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    <span class="material-symbols-outlined">groups</span>
+                    <span>Colaboradores (Área)</span>
                 </a>
-                <a href="/ajustes" class="module-link">
-                    <div class="link-icon">⚙️</div>
-                    <span>Ajustes</span>
+                <a href="/departamentos" class="module-link flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    <span class="material-symbols-outlined">account_tree</span>
+                    <span>Departamentos</span>
+                </a>
+                <a href="/eps-pensiones" class="module-link flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    <span class="material-symbols-outlined">medical_services</span>
+                    <span>EPS & Pensiones</span>
+                </a>
+
+                <div class="px-3 py-2 mt-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Bienestar</div>
+                <a href="/cumpleanos" class="module-link flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    <span class="material-symbols-outlined">cake</span>
+                    <span>Cumpleaños</span>
+                </a>
+                <a href="/aniversarios" class="module-link flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    <span class="material-symbols-outlined">workspace_premium</span>
+                    <span>Aniversarios</span>
+                </a>
+                <a href="/hijos-activos" class="module-link flex items-center gap-3 p-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    <span class="material-symbols-outlined">child_care</span>
+                    <span>Hijos Activos</span>
+                </a>
+
+                <div class="px-3 py-2 mt-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Sistema</div>
+               <a href="/usuarios" class="module-link flex items-center gap-3 ...">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span>Configuración</span>
                 </a>
             </nav>
 
-            <div class="sidebar-footer">
-                <button class="btn-logout-alt" onclick="logout()">
-                    <span>Cerrar Sesión</span>
-                    <i>🚪</i>
-                </button>
+            <div class="sidebar-footer-custom p-4 border-t border-gray-800 bg-gray-950">
+                <div class="user-profile-mini flex items-center gap-3 mb-4">
+                    <div class="avatar-brand w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">T</div>
+                    <div class="overflow-hidden">
+                        <span id="display-user-name" class="text-white text-sm font-bold block truncate">Usuario</span>
+                        <span class="user-email-text text-[10px] text-gray-400 truncate block">Cargando rol...</span>
+                    </div>
+                </div>
+                <button class="btn-logout-simple w-full bg-red-900/20 text-red-400 py-2 rounded-lg hover:bg-red-900/40 transition text-sm font-bold">Log Out</button>
             </div>
         </aside>
 
-        <div class="main-viewport">
-            <header class="top-nav">
+        <div class="main-viewport flex-1 flex flex-col h-full overflow-hidden">
+            <header class="top-nav h-16 bg-white border-b flex items-center px-8 flex-shrink-0">
                 <div class="page-context">
-                    <h2 id="page-title">Panel de Gestión</h2>
-                    <span id="dynamic-greeting" class="greeting-text">Hola, cargando...</span>
-                </div>
-
-                <div class="user-control-center">
-                    <div class="profile-card">
-                        <div class="avatar-container">
-                            <div class="avatar-sm" id="user-avatar-head">U</div>
-                            <span class="status-indicator"></span>
-                        </div>
-                        <div class="user-meta-head">
-                            <strong id="display-user-name">Usuario</strong>
-                            <span id="user-role-badge">Administrator</span>
-                        </div>
-                        <div class="dropdown-trigger">▼</div>
-                    </div>
+                    <h2 id="page-title" class="text-xl font-bold text-gray-800 uppercase tracking-tight">Panel de Gestión</h2>
                 </div>
             </header>
-
-            <main class="workspace">
+            
+            <main class="workspace flex-1 overflow-y-auto bg-gray-50">
                 <div id="dashboard-content" class="content-animate"></div> 
             </main>
         </div>
     </div>
 
     <script type="module" src="/src/main.js"></script>
-    <script>
-        function logout(){ 
-            localStorage.clear(); 
-            window.location.href='/'; 
-        }
-    </script>
 </body>
 </html>

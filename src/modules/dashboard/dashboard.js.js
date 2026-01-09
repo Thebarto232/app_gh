@@ -1,59 +1,111 @@
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
+import { apiFetch } from "../../api/api.js";
 
+export const initDashboard = async () => {
+    console.log("🚀 Iniciando Dashboard...");
+    
+    await Promise.allSettled([
+        cargarEstadisticas(),
+        cargarMiniListaCumple(),
+        initCalendar()
+    ]);
+};
+
+// 1. CARGAR KPIs
+async function cargarEstadisticas() {
+    try {
+        const stats = await apiFetch("/dashboard/stats/summary");
+        if (stats) {
+            setStat('stat-total', stats.totalEmpleados);
+            setStat('stat-activos', stats.activos);
+            setStat('stat-hijos', stats.hijos);
+            setStat('stat-deptos', stats.departamentos);
+        }
+    } catch (error) {
+        console.warn("Error KPIs:", error);
+    }
+}
+
+function setStat(id, valor) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = valor || 0;
+}
+
+// 2. LISTA CUMPLEAÑOS
+async function cargarMiniListaCumple() {
+    const lista = document.getElementById('dash-cumple-lista');
+    if (!lista) return;
+
+    try {
+        const data = await apiFetch("/dashboard/reportes/cumpleanos");
+        
+        if (!data || data.length === 0) {
+            lista.innerHTML = `<p class="text-center text-gray-400 text-xs py-6">No hay cumpleaños</p>`;
+            return;
+        }
+
+        lista.innerHTML = data.slice(0, 5).map(emp => `
+            <div class="flex items-center gap-3 p-3 rounded-2xl hover:bg-pink-50 transition-colors">
+                <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-xs">
+                    ${emp.dia}
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-gray-800">${emp.apellidos_nombre}</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">${emp.nombre_area || 'General'}</p>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        lista.innerHTML = `<p class="text-red-400 text-xs text-center">Error de conexión</p>`;
+    }
+}
+
+// 3. CALENDARIO
 export const initCalendar = async () => {
     const calendarEl = document.getElementById('calendar');
-    const modal = document.getElementById('modalCita');
-    const form = document.getElementById('formNuevaCita');
+    if (!calendarEl) return;
+    calendarEl.innerHTML = "";
 
     const calendar = new Calendar(calendarEl, {
-        plugins: [dayGridPlugin, interactionPlugin],
+        plugins: [dayGridPlugin],
         initialView: 'dayGridMonth',
         locale: esLocale,
-        selectable: true,
-        events: 'http://localhost:3000/api/dashboard/citas', // Tu ruta de backend
+        height: 'auto',
+        headerToolbar: { left: 'title', center: '', right: 'prev,next' },
+        buttonText: { today: 'Hoy' },
+        
+        events: async (info, successCallback, failureCallback) => {
+            try {
+                const eventos = await apiFetch("/dashboard/citas");
+                successCallback(eventos || []);
+            } catch (error) {
+                console.error("Error calendario:", error);
+                failureCallback(error);
+            }
+        },
 
-        select: function(info) {
-            // Cuando el usuario selecciona una fecha, abrimos el diseño del modal
-            document.getElementById('fechaInicio').value = info.startStr;
-            document.getElementById('fechaFin').value = info.endStr;
-            modal.style.display = 'block';
+        eventDidMount: (info) => {
+            const tipo = info.event.extendedProps.tipo;
+            const el = info.el;
+            el.style.border = 'none';
+            el.style.fontSize = '0.75rem';
+            el.style.padding = '2px';
+
+            if (tipo === 'CUMPLE') {
+                el.style.backgroundColor = '#ec4899';
+                el.style.color = 'white';
+            } else if (tipo === 'ANIVERSARIO') {
+                el.style.backgroundColor = '#14b8a6';
+                el.style.color = 'white';
+            } else {
+                el.style.backgroundColor = '#3b82f6';
+                el.style.color = 'white';
+            }
+            el.title = info.event.title;
         }
     });
 
     calendar.render();
-
-    // Cerrar modal
-    document.getElementById('btnCerrarModal').onclick = () => modal.style.display = 'none';
-
-    // Enviar información al backend
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-        
-        const nuevaCita = {
-            titulo: document.getElementById('inputTitulo').value,
-            descripcion: document.getElementById('inputDesc').value,
-            fecha_inicio: document.getElementById('fechaInicio').value,
-            fecha_fin: document.getElementById('fechaFin').value,
-            fk_id_usuario: localStorage.getItem('id_usuario') // El ID que viene del login
-        };
-
-        const response = await fetch('http://localhost:3000/api/citas', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(nuevaCita)
-        });
-
-        if (response.ok) {
-            modal.style.display = 'none';
-            form.reset();
-            calendar.refetchEvents(); // Recarga las citas sin refrescar la página
-            alert("Cita agendada correctamente");
-        }
-    };
 };

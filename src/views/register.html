@@ -1,29 +1,34 @@
 <div class="login-container">
-    <h2>Registro de Personal RRHH</h2>
+    <h2>Registro de Acceso</h2>
+    <p class="text-sm text-gray-500 mb-4">Crea una cuenta para iniciar tu proceso.</p>
+    
     <form id="registerForm" class="login-form">
         <div class="field">
-            <label for="reg-username">Usuario</label>
-            <input type="text" id="reg-username" placeholder="Nombre de usuario" required />
+            <label for="reg-name">Nombre Completo</label>
+            <input type="text" id="reg-name" placeholder="Ej: Juan Pérez" required />
+        </div>
+
+        <div class="field">
+            <label for="reg-email">Correo Corporativo</label>
+            <input type="email" id="reg-email" placeholder="ejemplo@empresa.com" required />
         </div>
 
         <div class="field">
             <label for="reg-password">Contraseña</label>
-            <input type="password" id="reg-password" placeholder="Cree una contraseña" required />
+            <input type="password" id="reg-password" placeholder="Cree una contraseña segura" required />
         </div>
 
-        <div class="field">
-            <label for="reg-rol">Rol Asignado</label>
-            <select id="reg-rol" required>
-                <option value="">Seleccione un rol...</option>
-                <option value="1">Admin</option>
-                <option value="2">Gestion Humana</option>
-                <option value="3">Visitante</option>
-            </select>
-        </div>
+        <input type="hidden" id="reg-rol" value="3" />
 
-        <button type="submit" id="btnRegister">Registrar Usuario</button>
+        <button type="submit" id="btnRegister">Registrar mi Cuenta</button>
     </form>
 
-    <p id="reg-error" class="error"></p>
-    <p id="reg-success" style="color: green; display: none;">¡Usuario creado con éxito! Redirigiendo...</p>
+    <p id="reg-error" class="error" style="color: red; margin-top: 10px; font-size: 0.9rem;"></p>
+    <p id="reg-success" style="color: green; display: none; margin-top: 10px; font-weight: bold;">
+        ¡Cuenta creada con éxito! Redirigiendo...
+    </p>
+    
+    <div class="mt-4">
+        <a href="/" class="text-sm text-blue-600 hover:underline">¿Ya tienes cuenta? Inicia sesión</a>
+    </div>
 </div>
