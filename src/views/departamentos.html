@@ -1,0 +1,31 @@
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; height: 100%;">
+    
+    <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden;">
+        <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-weight: 800; color: #1e293b; font-size: 1rem;">🏢 Departamentos</h3>
+            <button onclick="window.modalCrearDepto()" style="background: #14b8a6; border: none; width: 32px; height: 32px; border-radius: 8px; color: white; cursor: pointer; font-weight: bold;">+</button>
+        </div>
+        
+        <div id="lista-deptos" style="flex: 1; overflow-y: auto; padding: 10px;">
+            <p style="text-align: center; color: #94a3b8; padding: 20px;">Cargando...</p>
+        </div>
+    </div>
+
+    <div id="panel-areas" style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; opacity: 0.5; pointer-events: none;">
+        <div style="padding: 20px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin: 0; font-weight: 800; color: #1e293b; font-size: 1rem;">Áreas Funcionales</h3>
+                <p id="titulo-depto-seleccionado" style="margin: 4px 0 0; font-size: 0.8rem; color: #64748b;">Selecciona un departamento</p>
+            </div>
+            <button onclick="window.modalCrearArea()" id="btn-nueva-area" style="background: #3b82f6; border: none; padding: 8px 16px; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; font-size: 0.85rem;">+ Nueva Área</button>
+        </div>
+
+        <div id="lista-areas" style="flex: 1; overflow-y: auto; padding: 20px;">
+            <div style="text-align: center; margin-top: 40px; color: #cbd5e1;">
+                <span class="material-symbols-outlined" style="font-size: 48px;">touch_app</span>
+                <p>Selecciona un departamento a la izquierda</p>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,12 +1,13 @@
 import { login } from '../auth/login.js';
 import { initDashboard } from '../modules/dashboard/dashboard.js'; 
-import { initModuloEmpleados } from '../modules/empleados/empleados.js'; 
 
-// Eliminamos la importación de main.js para evitar el error de referencia circular
-// import { updateSidebarUI } from '../main.js'; 
+// --- CORRECCIÓN 1: Importar el nuevo módulo de Colaboradores ---
+import { initModuloColaboradores } from '../modules/gestion/colaboradores.js'; 
 
-// Importa aquí el resto de módulos cuando los tengas listos
-// import { initModuloCumpleanos, ... } from ...
+// Importaciones de otros módulos
+import { initModuloBienestar } from '../modules/bienestar/bienestar.js'; 
+import { initModuloSeguridadSocial } from '../modules/gestion/seguridadSocial.js';
+import { initModuloDepartamentos } from '../modules/gestion/departamentos.js';
 
 // --- NAVEGACIÓN SPA (Single Page Application) ---
 export const navigateTo = (path) => {
@@ -16,7 +17,7 @@ export const navigateTo = (path) => {
 
 const loadModule = async (path, container) => {
     try {
-        // Asegúrate de que tus archivos HTML estén en src/views/
+        // Asegúrate de que la ruta base coincida con tu estructura de carpetas
         const res = await fetch(`/src/views/${path}`);
         if (!res.ok) throw new Error(`Vista no encontrada: ${path}`);
         container.innerHTML = await res.text();
@@ -61,9 +62,7 @@ async function setupAuthForms(type) {
         if(successMsg) successMsg.style.display = 'none';
 
         try {
-            // ==============================
             // CASO LOGIN
-            // ==============================
             if (type === 'login') {
                 const inputEmail = document.getElementById("email") || document.getElementById("username");
                 const inputPass = document.getElementById("password");
@@ -78,20 +77,14 @@ async function setupAuthForms(type) {
                 if (result?.token) {
                     localStorage.setItem('token', result.token);
                     localStorage.setItem('user', JSON.stringify(result.user));
-                    
-                    // CAMBIO CRÍTICO: Usamos href para recargar la página completa.
-                    // Esto evita problemas de dependencias circulares con el Sidebar.
                     window.location.href = '/dashboard';
                 }
 
-            // ==============================
             // CASO REGISTRO
-            // ==============================
             } else {
                 const regName = document.getElementById("reg-name")?.value.trim();
                 const regEmail = document.getElementById("reg-email")?.value.trim(); 
                 
-                // Generar nombre si no existe
                 const finalName = regName || (regEmail ? regEmail.split('@')[0] : 'Usuario');
                 const regPass = document.getElementById("reg-password")?.value.trim();
                 const regRol = document.getElementById("reg-rol")?.value;
@@ -102,7 +95,7 @@ async function setupAuthForms(type) {
                     email: regEmail,
                     password: regPass,
                     nombre_completo: finalName,
-                    fk_id_rol: regRol || 3 // Rol por defecto (Visitante)
+                    fk_id_rol: regRol || 3 
                 };
 
                 const res = await fetch('http://localhost:3000/api/auth/register', {
@@ -121,7 +114,7 @@ async function setupAuthForms(type) {
                 }
 
                 setTimeout(() => {
-                    navigateTo('/'); // Ir al Login
+                    navigateTo('/'); 
                 }, 1500);
             }
 
@@ -150,7 +143,6 @@ export const initRouter = async () => {
             await loadModule('register.html', appContainer);
             setupAuthForms('register');
         } else {
-            // Cualquier otra ruta sin token lleva al Login
             await loadModule('login.html', appContainer);
             setupAuthForms('login');
         }
@@ -171,22 +163,34 @@ export const initRouter = async () => {
             initDashboard(); 
             break;
             
-        case '/area': // Gestión de Empleados
-            await loadModule('empleados.html', dashContent);
-            initModuloEmpleados();
+        // --- CORRECCIÓN 2: Apuntar al archivo HTML y Función JS nuevos ---
+        case '/area': 
+            await loadModule('colaboradores.html', dashContent); // Carga la vista nueva
+            initModuloColaboradores(); // Carga la lógica nueva
             break;
 
-        // --- MÓDULOS PENDIENTES ---
-        // Asegúrate de que estos archivos existan o comenta los casos
-        // case '/cumpleanos':
-        //    await loadModule('cumpleanos.html', dashContent);
-        //    if(typeof initModuloCumpleanos === 'function') initModuloCumpleanos();
-        //    break;
+        case '/cumpleanos':
+            await loadModule('cumpleanos.html', dashContent);
+            initModuloBienestar('/cumpleanos');
+            break;
+
+        case '/aniversarios':
+            await loadModule('aniversarios.html', dashContent);
+            initModuloBienestar('/aniversarios');
+            break;
+        
+        case '/eps-pensiones':
+            await loadModule('seguridad_social.html', dashContent);
+            initModuloSeguridadSocial();
+            break;
+
+        case '/departamentos':
+            await loadModule('departamentos.html', dashContent);
+            initModuloDepartamentos();
+            break;
         
         default:
-            // Si está logueado y entra a la raíz, va al dashboard
             if (path === '/' || path === '/login') navigateTo('/dashboard');
-            // Si la ruta no existe, cargamos dashboard por defecto o una 404
             else {
                  await loadModule('dashboard.html', dashContent);
                  initDashboard();
@@ -196,12 +200,10 @@ export const initRouter = async () => {
 };
 
 // --- EVENT LISTENER GLOBAL ---
-// Intercepta los clics en enlaces para usar la navegación SPA
 document.addEventListener('click', (e) => {
     const link = e.target.closest('a');
     if (link) {
         const href = link.getAttribute('href');
-        // Solo interceptamos rutas internas (que empiezan con /)
         if (href && href.startsWith('/') && !href.startsWith('http')) {
             e.preventDefault();
             navigateTo(href);

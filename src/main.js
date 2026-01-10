@@ -2,7 +2,7 @@
 import { initRouter } from './router/router.js';
 
 /**
- * ACTUALIZA LA INTERFAZ SEGÚN EL ROL
+ * ACTUALIZA LA INTERFAZ (SIDEBAR)
  */
 export const updateSidebarUI = async () => {
     const userData = localStorage.getItem('user');
@@ -12,11 +12,11 @@ export const updateSidebarUI = async () => {
 
     const user = JSON.parse(userData);
     
-    // 1. NORMALIZACIÓN DE DATOS
+    // 1. DATOS USUARIO
     const userRole = (user.rol || user.nombre_rol || 'VISITANTE').toUpperCase(); 
     const userName = user.nombre_completo || user.apellidos_nombre || user.email || 'Usuario';
 
-    // 2. ELEMENTOS DEL DOM
+    // 2. DOM - USUARIO
     const elements = {
         name: document.getElementById('display-user-name') || document.getElementById('user-name'),
         roleText: document.querySelector('.user-email-text') || document.getElementById('user-role'),
@@ -24,7 +24,6 @@ export const updateSidebarUI = async () => {
         greeting: document.getElementById('dynamic-greeting')
     };
 
-    // 3. ACTUALIZAR UI
     if (elements.name) elements.name.innerText = userName;
     if (elements.roleText) elements.roleText.innerText = userRole;
     if (elements.avatar) elements.avatar.innerText = userName.charAt(0).toUpperCase();
@@ -35,7 +34,7 @@ export const updateSidebarUI = async () => {
         elements.greeting.innerText = `${msg}, ${userName.split(' ')[0]}`;
     }
 
-    // 4. SEGURIDAD VISUAL
+    // 3. SEGURIDAD (Botones)
     const btnNuevoEmpleado = document.getElementById('btnNuevoEmpleado');
     const rolesAutorizados = ['ADMIN', 'RRHH', 'COORD. GH', 'GESTOR DE CONTRATACION'];
 
@@ -47,9 +46,11 @@ export const updateSidebarUI = async () => {
         }
     }
 
-    // 5. CARGA DE ESTADÍSTICAS
+    // 4. ESTADÍSTICAS (KPIs Sidebar)
     if (token) {
         try {
+            console.log("🔄 Actualizando Sidebar...");
+            // RUTA CORRECTA: /dashboard/stats/summary
             const response = await fetch('http://localhost:3000/api/dashboard/stats/summary', {
                 headers: { 
                     'Authorization': `Bearer ${token}`,
@@ -59,20 +60,32 @@ export const updateSidebarUI = async () => {
 
             if (response.ok) {
                 const stats = await response.json();
-                
-                // Actualizar contadores del menú
-                const linkHijos = document.querySelector('a[href="/hijos-activos"] span');
-                const linkDeptos = document.querySelector('a[href="/departamentos"] span');
-                
-                if (linkHijos && stats.hijos !== undefined) {
-                    linkHijos.innerText = `Hijos (${stats.hijos})`;
-                }
-                if (linkDeptos && stats.departamentos !== undefined) {
-                    linkDeptos.innerText = `Deptos (${stats.departamentos})`;
-                }
+                console.log("✅ Datos recibidos:", stats);
+
+                // --- CORRECCIÓN DE SELECTORES ---
+                // Buscamos todos los <span> dentro de los enlaces del menú
+                const menuSpans = document.querySelectorAll('.nav-link span, a span');
+
+                menuSpans.forEach(span => {
+                    const texto = span.innerText.toLowerCase();
+
+                    // Actualizar DEPTOS (Evitamos borrar íconos buscando texto clave)
+                    if (texto.includes('deptos') || texto.includes('departamentos')) {
+                        // Si ya tiene número "(5)", lo limpiamos para dejar solo el nombre base si quieres
+                        // O simplemente reemplazamos todo:
+                        span.innerText = `Deptos (${stats.departamentos || 0})`;
+                    }
+
+                    // Actualizar HIJOS
+                    if (texto.includes('hijos') || texto.includes('activos')) {
+                        span.innerText = `Hijos Activos (${stats.hijos || 0})`;
+                    }
+                });
+            } else {
+                console.warn("⚠️ Error al obtener stats:", response.status);
             }
         } catch (error) { 
-            console.warn("No se pudo conectar al servidor (Stats)"); 
+            console.error("❌ Error de conexión Sidebar:", error);
         }
     }
 };
@@ -82,12 +95,14 @@ const handleLogout = () => {
     window.location.href = '/';
 };
 
+// Logout Global
 document.addEventListener('click', (e) => {
     if (e.target.closest('.btn-logout-simple') || e.target.closest('#btnLogout') || e.target.textContent.trim() === 'Log Out') {
         handleLogout();
     }
 });
 
+// Inicialización
 document.addEventListener('DOMContentLoaded', async () => {
     await initRouter();
     await updateSidebarUI();
